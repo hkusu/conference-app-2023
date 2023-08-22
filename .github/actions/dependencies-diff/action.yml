@@ -124,8 +124,6 @@ runs:
           if [ -n "$result" ]; then
             echo 'exists-diff=true' >> $GITHUB_OUTPUT
 
-            echo 'As a result of checking this module as a base point, there is difference in dependencies. Note that this also includes the results of modules included by this module.' >> $GITHUB_STEP_SUMMARY
-
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "$result" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
@@ -140,7 +138,7 @@ runs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo '</details>' >> $GITHUB_STEP_SUMMARY
           else
-            echo 'As a result of checking this module as a base point, there is no difference in dependencies. However, if this module is included, a difference may occur.' >> $GITHUB_STEP_SUMMARY
+            echo 'There was no difference in dependencies, in case this module is the base point.' >> $GITHUB_STEP_SUMMARY
             echo '' >> $GITHUB_STEP_SUMMARY
           fi
         done
