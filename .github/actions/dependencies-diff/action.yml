@@ -138,7 +138,7 @@ runs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo '</details>' >> $GITHUB_STEP_SUMMARY
           else
-            echo 'There was no difference in dependencies, in case this module is the base point.' >> $GITHUB_STEP_SUMMARY
+            echo 'No difference in dependencies, in case this module is the base point.' >> $GITHUB_STEP_SUMMARY
             echo '' >> $GITHUB_STEP_SUMMARY
           fi
         done

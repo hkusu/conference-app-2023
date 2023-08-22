@@ -39,7 +39,7 @@ jobs:
           header: dependencies-diff-app
           number: ${{ github.event.pull_request.number }}
           recreate: true
-          message: ':warning: There is a difference in dependencies for `app-android` module. See details [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
+          message: ':warning: There were differences in dependencies for the `app-android` module. See details [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
   check-core:
     permissions:
       contents: read
@@ -62,7 +62,7 @@ jobs:
           header: dependencies-diff-core
           number: ${{ github.event.pull_request.number }}
           recreate: true
-          message: ':warning: There is a difference in dependencies for `core:*` module. See details [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
+          message: ':warning: There were differences in dependencies for `core:*` modules. See details [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
   check-feature:
     permissions:
       contents: read
@@ -85,4 +85,4 @@ jobs:
           header: dependencies-diff-feature
           number: ${{ github.event.pull_request.number }}
           recreate: true
-          message: ':warning: There is a difference in dependencies for `feature:*` module. See details [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
+          message: ':warning: There were differences in dependencies for `feature:*` modules. See details [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
