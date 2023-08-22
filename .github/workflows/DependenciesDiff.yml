@@ -27,4 +27,10 @@ jobs:
         with:
           modules: 'app-android|devDebugRuntimeClasspath core:common core:data core:designsystem core:model core:testing core:ui feature:about feature:contributors feature:floor-map feature:main feature:sessions feature:sponsors feature:staff feature:stamps'
           configuration: 'debugRuntimeClasspath'
-      - run: echo '${{ steps.dependencies-diff.outputs.exists-diff }}'
+      - if: github.event_name == 'pull_request' && steps.dependencies-diff.outputs.exists-diff == 'true'
+        uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
+        with:
+          header: dependencies-diff
+          number: ${{ github.event.pull_request.number }}
+          recreate: true
+          message: ':warning: There is a difference in dependencies. See details [here](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).'
