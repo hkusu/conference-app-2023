@@ -26,6 +26,6 @@ jobs:
       - uses: ./.github/actions/dependencies-diff
         id: dependencies-diff
         with:
-          modules: 'core:common'
+          modules: 'core:common core:data'
           configuration: 'debugRuntimeClasspath'
       - run: echo '${{ steps.dependencies-diff.outputs.exists-diff }}'
