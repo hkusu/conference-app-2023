@@ -32,7 +32,7 @@ jobs:
         with:
           modules: 'app-android'
           configuration: 'devDebugRuntimeClasspath'
-          report-title: 'Gradle dependencies difference [for `app-android` module]'
+          report-title: 'Gradle dependencies difference [for the `app-android` module]'
       - if: github.event_name == 'pull_request' && steps.dependencies-diff.outputs.exists-diff == 'true'
         uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
         with:
@@ -55,7 +55,7 @@ jobs:
         with:
           modules: 'core:common core:data core:designsystem core:model core:testing core:ui'
           configuration: 'debugRuntimeClasspath'
-          report-title: 'Gradle dependencies difference [for `core:*` module]'
+          report-title: 'Gradle dependencies difference [for `core:*` modules]'
       - if: github.event_name == 'pull_request' && steps.dependencies-diff.outputs.exists-diff == 'true'
         uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
         with:
@@ -78,7 +78,7 @@ jobs:
         with:
           modules: 'feature:about feature:contributors feature:floor-map feature:main feature:sessions feature:sponsors feature:staff feature:stamps'
           configuration: 'debugRuntimeClasspath'
-          report-title: 'Gradle dependencies difference [for `feature:*` module]'
+          report-title: 'Gradle dependencies difference [for `feature:*` modules]'
       - if: github.event_name == 'pull_request' && steps.dependencies-diff.outputs.exists-diff == 'true'
         uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
         with:
