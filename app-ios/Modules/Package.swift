@@ -23,6 +23,7 @@ var package = Package(
         .package(url: "https://github.com/realm/SwiftLint", from: "0.52.4"),
         .package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.2"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "10.13.0"),
     ],
     targets: [
         .target(
@@ -50,6 +51,14 @@ var package = Package(
             ],
             plugins: [
                 .plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
+            ]
+        ),
+
+        .target(
+            name: "Auth",
+            dependencies: [
+                "shared",
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
             ]
         ),
 
@@ -91,7 +100,9 @@ var package = Package(
         .target(
             name: "KMPContainer",
             dependencies: [
+                "Auth",
                 "shared",
+                "RemoteConfig",
                 .product(name: "Dependencies", package: "swift-dependencies"),
             ]
         ),
@@ -174,6 +185,14 @@ var package = Package(
                 "Stamps",
                 "Theme",
                 "Timetable",
+            ]
+        ),
+
+        .target(
+            name: "RemoteConfig",
+            dependencies: [
+                "shared",
+                .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
             ]
         ),
 
