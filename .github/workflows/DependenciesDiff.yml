@@ -22,10 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - uses: ./.github/actions/setup-java
-#      - run: ./gradlew :app-android:assemble --stacktrace
       - uses: ./.github/actions/dependencies-diff
         id: dependencies-diff
         with:
-          modules: 'core:common core:data'
+          modules: 'app-android|devDebugRuntimeClasspath core:common core:data core:designsystem core:model core:testing core:ui'
           configuration: 'debugRuntimeClasspath'
       - run: echo '${{ steps.dependencies-diff.outputs.exists-diff }}'
