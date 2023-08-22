@@ -25,6 +25,6 @@ jobs:
       - uses: ./.github/actions/dependencies-diff
         id: dependencies-diff
         with:
-          modules: 'app-android|devDebugRuntimeClasspath core:common core:data core:designsystem core:model core:testing core:ui'
+          modules: 'app-android|devDebugRuntimeClasspath core:common core:data core:designsystem core:model core:testing core:ui feature:about feature:contributors feature:floor-map feature:main feature:sessions feature:sponsors feature:staff feature:stamps'
           configuration: 'debugRuntimeClasspath'
       - run: echo '${{ steps.dependencies-diff.outputs.exists-diff }}'
