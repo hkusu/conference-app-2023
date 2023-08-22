@@ -1,0 +1,141 @@
+name: 'Gradle Dependencies Diff'
+description: ''
+inputs:
+  modules:
+    description: ''
+    required: true
+  configuration:
+    description: ''
+    required: true
+  project-dir:
+    description: ''
+    required: false
+    default: '.'
+outputs:
+  exists-diff:
+    description: ''
+    value: ${{ steps.analyze.outputs.exists-diff || 'false' }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Analyze dependencies
+      id: analyze
+      shell: bash
+      env:
+        REPOSITORY: ${{ github.repository }}
+        GH_TOKEN: ${{ github.token }}
+        EVENT_NAME: ${{ github.event_name }}
+        BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        AFTER_SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
+        MODULES: ${{ inputs.modules }}
+        CONFIGURATION: ${{ inputs.configuration }}
+        PROJECT_DIR: ${{ inputs.project-dir }}
+      run: |
+        if [[ "$EVENT_NAME" != 'pull_request' && "$EVENT_NAME" != 'push' ]]; then
+          echo "::error::This action must be triggered by a 'pull_request' or 'push' event."
+          exit 1
+        fi
+
+        if [[ -z "$MODULES" ]]; then
+          echo "::error::Specify 'module' input."
+          exit 1
+        fi
+
+        if [[ -z "$CONFIGURATION" ]]; then
+          echo "::error::Specify 'configuration' input."
+          exit 1
+        fi
+
+        modules=()
+        configurations=()
+
+        for module in $MODULES
+        do
+          configuration="$CONFIGURATION"
+
+          if [[ "$module" =~ '|' ]]; then
+            configuration=${module#*|}
+            module=${module%%|*}
+          fi
+
+          if [[ -z "$module" || -z "$configuration" ]]; then
+            echo "::error::Incorrect 'modules' input."
+            exit 1
+          fi
+
+          modules+=($module)
+          configurations+=($configuration)
+        done
+
+        cd "$GITHUB_ACTION_PATH"
+
+        readonly WORK_DIR="$(pwd)"
+
+        mkdir tools
+        mkdir deps
+
+        curl -f -s -L -o "$WORK_DIR/tools/dependency-diff-tldr-r8.jar" 'https://github.com/careem/dependency-diff-tldr/releases/download/v0.0.6/dependency-diff-tldr-r8.jar'
+
+        if [ 'b76af4e71fe1bc3362207d648542337c21ab91e8' != "$(shasum "$WORK_DIR/tools/dependency-diff-tldr-r8.jar" | awk '{print $1}')" ]; then
+          echo '::error::Incorrect checksum for dependency-diff-tldr-r8.jar.'
+          exit 1
+        fi
+
+        curl -f -s -L -o "$WORK_DIR/tools/dependency-tree-diff.jar" 'https://github.com/JakeWharton/dependency-tree-diff/releases/download/1.2.0/dependency-tree-diff.jar'
+
+        if [ '949394274f37c06ac695b5d49860513e4d16e847' != "$(shasum "$WORK_DIR/tools/dependency-tree-diff.jar" | awk '{print $1}')" ]; then
+          echo '::error::Incorrect checksum for dependency-tree-diff.jar.'
+          exit 1
+        fi
+
+        gh repo clone "$REPOSITORY" sources
+        cd "sources/$PROJECT_DIR"
+
+        git checkout -q "$BEFORE_SHA"
+
+        for i in "${!modules[@]}"
+        do
+          ./gradlew ":${modules[$i]}:dependencies" --configuration "${configurations[$i]}" > "$WORK_DIR/deps/${modules[$i]}-before-deps.txt"
+        done
+
+        git checkout -q "$AFTER_SHA"
+
+        for i in "${!modules[@]}"
+        do
+          ./gradlew ":${modules[$i]}:dependencies" --configuration "${configurations[$i]}" > "$WORK_DIR/deps/${modules[$i]}-after-deps.txt"
+        done
+
+        echo '## Report from Gradle Dependencies Diff action' >> $GITHUB_STEP_SUMMARY
+        echo "- bofore commit SHA: \`${BEFORE_SHA}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- after commit SHA: \`${AFTER_SHA}\`" >> $GITHUB_STEP_SUMMARY
+
+        for i in "${!modules[@]}"
+        do
+          result="$(java -jar "$WORK_DIR/tools/dependency-diff-tldr-r8.jar" "$WORK_DIR/deps/${modules[$i]}-before-deps.txt" "$WORK_DIR/deps/${modules[$i]}-after-deps.txt")"
+
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo "### \`${modules[$i]}\` module ( \`${configurations[$i]}\` configuration )" >> $GITHUB_STEP_SUMMARY
+
+          if [ -n "$result" ]; then
+            echo 'exists-diff=true' >> $GITHUB_OUTPUT
+
+            echo 'As a result of checking this module as a base point, there is difference in dependencies. Note that this also includes the results of modules included by this module.' >> $GITHUB_STEP_SUMMARY
+
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "$result" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            result_detail="$(java -jar "$WORK_DIR/tools/dependency-tree-diff.jar" "$WORK_DIR/deps/${modules[$i]}-before-deps.txt" "$WORK_DIR/deps/${modules[$i]}-after-deps.txt")"
+
+            echo '<details>' >> $GITHUB_STEP_SUMMARY
+            echo '<summary>detail</summary>' >> $GITHUB_STEP_SUMMARY
+            echo '' >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            echo "$result_detail" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo '</details>' >> $GITHUB_STEP_SUMMARY
+          else
+            echo 'As a result of checking this module as a base point, there is no difference in dependencies. However, if this module is included, a difference may occur.' >> $GITHUB_STEP_SUMMARY
+            echo '' >> $GITHUB_STEP_SUMMARY
+          fi
+        done
