@@ -7,8 +7,8 @@ on:
     paths:
       - '**/libs.versions.toml'
   pull_request:
-#    paths:
-#      - '**/libs.versions.toml'
+    paths:
+      - '**/libs.versions.toml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -34,8 +34,6 @@ jobs:
           modules: 'app-android'
           configuration: 'devDebugRuntimeClasspath'
           report-title: 'Gradle dependency diff [for `app-android` module]'
-          before-ref: a2862c1e42dd42545e084a024df7915edb09935b
-          after-ref: 678611f1cfe51e0731c80b1db8a7f197467d2d3e
       - if: github.event_name == 'pull_request' && steps.dependency.outputs.exists-diff == 'true'
         uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
         with:
@@ -60,8 +58,6 @@ jobs:
           modules: 'core:common core:data core:designsystem core:model core:testing core:ui'
           configuration: 'debugRuntimeClasspath'
           report-title: 'Gradle dependency diff [for `core:*` modules]'
-          before-ref: a2862c1e42dd42545e084a024df7915edb09935b
-          after-ref: 678611f1cfe51e0731c80b1db8a7f197467d2d3e
       - if: github.event_name == 'pull_request' && steps.dependency.outputs.exists-diff == 'true'
         uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
         with:
@@ -86,8 +82,6 @@ jobs:
           modules: 'feature:about feature:contributors feature:floor-map feature:main feature:sessions feature:sponsors feature:staff feature:stamps'
           configuration: 'debugRuntimeClasspath'
           report-title: 'Gradle dependency diff [for `feature:*` modules]'
-          before-ref: a2862c1e42dd42545e084a024df7915edb09935b
-          after-ref: 678611f1cfe51e0731c80b1db8a7f197467d2d3e
       - if: github.event_name == 'pull_request' && steps.dependency.outputs.exists-diff == 'true'
         uses: marocchino/sticky-pull-request-comment@efaaab3fd41a9c3de579aba759d2552635e590fd # v2.8.0
         with:
