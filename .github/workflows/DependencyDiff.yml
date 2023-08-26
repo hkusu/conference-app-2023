@@ -16,7 +16,7 @@ concurrency:
 
 permissions: {}
 
-evn:
+env:
   SUMMARY_URL: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
 
 jobs:
